@@ -1,4 +1,4 @@
-# TradeTesterR
+# TradeTesterR <img src="man/figures/logo.png" align="right" height="139" />
 
 ## Democratizing Access to Professional-Grade Backtesting
 
