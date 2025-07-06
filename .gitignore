@@ -1,0 +1,77 @@
+# R specific files
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+
+# RStudio files
+.Rproj.user/
+*.Rproj
+
+# Session Data files
+*.RData
+*.rda
+*.rds
+
+# Temporary files
+*~
+.~*
+*.swp
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Build files
+*.tar.gz
+*.Rcheck/
+
+# knitr and R markdown default cache directories
+*_cache/
+/cache/
+
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
+
+# R Environment Variables
+.Renviron
+
+# Output files
+*.log
+*.out
+
+# Compiled code
+src/*.o
+src/*.so
+src/*.dll
+
+# Documentation
+/Meta/
+/doc/
+!/doc/
+/doc/*
+!/doc/*.R
+!/doc/*.Rmd
+
+# Vignettes
+vignettes/*.html
+vignettes/*.pdf
+vignettes/.build.timestamp
+
+# OAuth2 token
+.httr-oauth
+
+# Coverage reports
+covr/
+coverage.html
+coverage/
+
+# Translation temp files
+po/*~
+
+# RStudio project files (but keep the main one)
+.Rproj.user
+*.Rproj
+!TradeTesterR.Rproj
