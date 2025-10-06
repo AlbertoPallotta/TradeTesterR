@@ -68,7 +68,7 @@ Separates strategy logic from execution mechanics, teaching and enforcing the cr
 ```r
 # Install from GitHub
 # install.packages("devtools")
-devtools::install_github("alb3rtazzo/TradeTesterR")
+devtools::install_github("alb3rtazzo/TradeTesteR")
 ```
 
 ## Quick Start
