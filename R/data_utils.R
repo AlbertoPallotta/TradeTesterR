@@ -1,3 +1,20 @@
+#' Read market data from public sources
+#' @import data.table
+#' @import tidyquant
+#' @param symbol Instrument symbol (e.g., "AAPL", "EURUSD=X")
+#' @param from Start date (e.g., "2020-01-01")
+#' @param to End date (e.g., "2023-01-01")
+#' @export
+load_data_from_yahoo <- function(symbol, from = "2020-01-01", to = Sys.Date()) {
+  df <- tidyquant::tq_get(symbol, from=from, to=to, get='stock.prices')
+  setDT(df)
+  df[, symbol := NULL]
+  setnames(df, c("open_time", "Open", "High", "Low", "Close", "Volume", "Adjusted"))
+  df[, open_time := as.POSIXct(open_time, tz='UTC')]
+  setkey(df, open_time)
+
+  return(df)
+}
 
 #' @import data.table
 #' @importFrom xts xts
