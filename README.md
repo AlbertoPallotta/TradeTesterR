@@ -177,8 +177,8 @@ This project is licensed under the GPL-3 License - see the [LICENSE](LICENSE) fi
 ## Support
 
 - 📧 Email: pallottaalberto@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/alb3rtazzo/TradeTesterR/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/alb3rtazzo/TradeTesterR/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/AlbertoPallotta/TradeTesterR/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/AlbertoPallotta/TradeTesterR/discussions)
 
 ## Acknowledgments
 
