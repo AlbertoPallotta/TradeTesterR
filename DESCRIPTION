@@ -35,7 +35,8 @@ Imports:
     PerformanceAnalytics (>= 2.0.0),
     tidyquant (>= 1.0.0),
     quantmod (>= 0.4.0),
-    rlang (>= 1.0.0)
+    rlang (>= 1.0.0),
+    htmltools
 Suggests:
     testthat (>= 3.0.0),
     knitr,

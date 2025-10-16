@@ -4,7 +4,13 @@
 \alias{calculateTradeMetrics}
 \title{Calculate trading performance metrics}
 \usage{
-calculateTradeMetrics(bt, initial_equity, risk_free_rate, start, end)
+calculateTradeMetrics(
+  bt,
+  initial_equity,
+  risk_free_rate = NULL,
+  start = NULL,
+  end = NULL
+)
 }
 \arguments{
 \item{bt}{Backtest results object (output from backtest function)}
