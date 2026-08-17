@@ -160,7 +160,7 @@ If you use TradeTesterR in academic work, please cite:
 ```
 Pallotta, A. (2025). TradeTesterR: An Open-Source Backtesting Framework 
 for Accessible Quantitative Finance. Available at: 
-https://github.com/alb3rtazzo/TradeTesterR
+https://github.com/AlbertoPallotta/TradeTesterR
 ```
 
 ## License
@@ -187,3 +187,9 @@ This framework emerged from PhD research on democratizing quantitative finance t
 ---
 
 *"In an era where algorithmic and systematic trading increasingly dominate markets, democratizing access to development tools becomes essential for maintaining market diversity and opportunity."* - TradeTesterR Philosophy
+## Thesis reproducibility
+
+The version described in the doctoral thesis is TradeTesterR v0.1.0
+(tag v0.1.0, commit aa210d7). Install the exact thesis version with:
+
+    remotes::install_github("AlbertoPallotta/TradeTesterR@v0.1.0")

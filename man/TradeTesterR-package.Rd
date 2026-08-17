@@ -11,8 +11,8 @@ Core package documentation and central imports.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/alb3rtazzo/TradeTesterR}
-  \item Report bugs at \url{https://github.com/alb3rtazzo/TradeTesterR/issues}
+  \item \url{https://github.com/AlbertoPallotta/TradeTesterR}
+  \item Report bugs at \url{https://github.com/AlbertoPallotta/TradeTesterR/issues}
 }
 
 }
