@@ -211,10 +211,10 @@ exit_TP_SL_signal <- function(dis) {
   }
   dis[!is.na(ExitPerc), ExitAmount := exit_amount]
   dis[!is.na(ExitPerc), CurrentPosSize := current_size]
-  dis[, CurrentSize := OrderSize[1] + ExitAmount]
+  dis[!is.na(ExitPerc), CurrentSize := CurrentPosSize]
 
   # If some position remains in the end
-  remaining <- min(abs(dis$CurrentSize), na.rm=TRUE)
+  remaining <- abs(curr_size)
   if (remaining > 0) {
     dis[NROW(dis), ExitAmount := remaining * -1 * side]
     dis[NROW(dis), ExitTime := data.table::last(date)]
