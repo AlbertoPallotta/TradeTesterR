@@ -1,7 +1,7 @@
 Package: TradeTesterR
 Type: Package
 Title: Educational Backtesting Framework for Quantitative Trading Strategies
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person("Alberto", "Pallotta", 
            email = "pallottaalberto@gmail.com", 
