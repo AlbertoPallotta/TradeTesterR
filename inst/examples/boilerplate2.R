@@ -1,6 +1,5 @@
 rm(list=ls())
 library(TradeTesterR)
-
 # Load required libraries
 library(quantmod)    # For technical indicators (BBands)
 library(data.table)  # For data manipulation

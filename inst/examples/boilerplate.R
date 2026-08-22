@@ -1,7 +1,6 @@
 rm(list=ls())
 library(TradeTesterR)
 library(quantmod)
-#library(ermesPkg)
 library(data.table)
 library(lubridate)
 library(tidyquant)

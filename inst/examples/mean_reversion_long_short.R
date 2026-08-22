@@ -13,7 +13,7 @@
 # 146 trades.
 
 rm(list = ls())
-devtools::load_all()
+library(TradeTesterR)
 library(quantmod)
 library(data.table)
 library(lubridate)

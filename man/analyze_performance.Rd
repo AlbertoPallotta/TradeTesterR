@@ -37,8 +37,10 @@ in decimal or percent (the function auto-scales if \code{>1}).}
 \value{
 A \code{data.table} with both trade-level and time-series metrics:
 \itemize{
-  \item \strong{Trade-level:} total_pnl, n_trades, win_rate, profit_factor, avg_win, avg_loss, expectancy,
-        max_trade_dd (P\&L path on trade closes), win_loss_ratio.
+  \item \strong{Trade-level:} total_pnl, n_trades (one per trade; partial-exit
+        legs aggregate to a single trade), win_rate, profit_factor, avg_win,
+        avg_loss, expectancy, max_trade_dd (P\&L path on trade closes),
+        win_loss_ratio.
   \item \strong{Time-series:} cagr, ann_vol, sharpe, sortino, max_dd, max_dd_pct, ulcer_index.
 }
 }
@@ -49,9 +51,11 @@ trade-level metrics (profit factor, win rate, expectancy, etc.).
 }
 \details{
 Time-series metrics use \code{$equity_curve} if present; otherwise a step-wise
-daily equity is built from summed P\&L at each \code{as.Date(ExitTime)}. This
-approximation ignores mark-to-market between trade dates; use a true daily curve
-for precise risk metrics.
+equity is built from summed P\&L at each \code{as.Date(ExitTime)}. In either
+case the curve is padded onto a daily grid (weekends removed) before daily
+returns, period length and annualized statistics are computed. This
+approximation ignores mark-to-market between trade dates; use a true daily
+curve for precise risk metrics.
 }
 \examples{
 \dontrun{

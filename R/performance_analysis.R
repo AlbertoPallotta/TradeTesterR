@@ -1,76 +1,5 @@
 
 
-#' Calculate trading performance metrics
-#'
-#' @description
-#' Computes key performance metrics including profit factor, Sharpe ratio,
-#' and Sortino ratio from backtest results.
-#'
-#' @param bt Backtest results object (output from backtest function)
-#' @param initial_equity Starting capital
-#' @param risk_free_rate Data.table with date and adjusted columns (e.g., from tq_get("^TNX"))
-#' @param start Start date for metric calculation
-#' @param end End date for metric calculation
-#'
-#' @return A data.table with columns:
-#'   - profit_factor: Sum of winning trades / abs(sum of losing trades)
-#'   - net_profit: Total profit/loss
-#'   - sharpe: Sharpe ratio
-#'   - sortino: Sortino ratio
-#'
-#' @examples
-#' \dontrun{
-#' # Get risk-free rate
-#' rf_rate <- data.table(tq_get("^TNX"))
-#'
-#' # Calculate metrics
-#' metrics <- calculateTradeMetrics(bt,
-#'                                initial_equity = 10000,
-#'                                risk_free_rate = rf_rate,
-#'                                start = "2020-01-01",
-#'                                end = "2021-12-31")
-#' }
-#' @import data.table
-#' @importFrom PerformanceAnalytics SortinoRatio SharpeRatio
-#' @importFrom xts xts
-#' @export
-calculateTradeMetrics <- function(bt, initial_equity, risk_free_rate, start, end) {
-  returns <- bt$results$Returns
-  profit_factor <- sum(returns[returns > 0], na.rm = TRUE) / abs(sum(returns[returns < 0], na.rm = TRUE))
-  net_profit <- sum(returns, na.rm = TRUE)
-  ret <- bt$results[, .(ExitTime, Returns)]
-  ret[, Ret := initial_equity + cumsum(Returns)]
-  ret[, PrevRet := shift(Ret, type = "lag")]
-  ret[1, PrevRet := initial_equity]
-  ret[, Ret := ((Returns + PrevRet) / PrevRet) - 1]
-  ret[, Day := as.Date(ExitTime)]
-  ret <- merge(ret,
-               risk_free_rate[, .(date, adjusted)],
-               by.x = "Day",
-               by.y = "date",
-               all = TRUE)
-  ret[is.na(Ret), Ret := 0]
-  ret[, adjusted := nafill(adjusted, type = "locf")]
-  ret[, adjusted := adjusted / 100]
-  ret <- ret[Day >= start & Day <= end]
-
-  sortino <- SortinoRatio(ret$Ret,
-                          MAR = 0,
-                          FUN = "StdDev")[1]
-  sharpe <- SharpeRatio(xts(ret$Ret, order.by = ret$Day),
-                        Rf = 0,
-                        FUN = "StdDev")[1]
-
-  out <- data.table(profit_factor = profit_factor,
-                    net_profit = net_profit,
-                    sharpe = sharpe,
-                    sortino = sortino)
-  return(out)
-}
-
-
-
-
 #' Analyze backtest performance (trade-level + time-series)
 #'
 #' @description
@@ -94,16 +23,20 @@ calculateTradeMetrics <- function(bt, initial_equity, risk_free_rate, start, end
 #'
 #' @return A \code{data.table} with both trade-level and time-series metrics:
 #' \itemize{
-#'   \item \strong{Trade-level:} total_pnl, n_trades, win_rate, profit_factor, avg_win, avg_loss, expectancy,
-#'         max_trade_dd (P\&L path on trade closes), win_loss_ratio.
+#'   \item \strong{Trade-level:} total_pnl, n_trades (one per trade; partial-exit
+#'         legs aggregate to a single trade), win_rate, profit_factor, avg_win,
+#'         avg_loss, expectancy, max_trade_dd (P\&L path on trade closes),
+#'         win_loss_ratio.
 #'   \item \strong{Time-series:} cagr, ann_vol, sharpe, sortino, max_dd, max_dd_pct, ulcer_index.
 #' }
 #'
 #' @details
 #' Time-series metrics use \code{$equity_curve} if present; otherwise a step-wise
-#' daily equity is built from summed P\&L at each \code{as.Date(ExitTime)}. This
-#' approximation ignores mark-to-market between trade dates; use a true daily curve
-#' for precise risk metrics.
+#' equity is built from summed P\&L at each \code{as.Date(ExitTime)}. In either
+#' case the curve is padded onto a daily grid (weekends removed) before daily
+#' returns, period length and annualized statistics are computed. This
+#' approximation ignores mark-to-market between trade dates; use a true daily
+#' curve for precise risk metrics.
 #'
 #' @examples
 #' \dontrun{
@@ -137,27 +70,36 @@ analyze_performance <- function(bt,
   if (nrow(res) == 0) stop("No trades in the selected window.")
 
   # ---------- Trade-level metrics ----------
-  total_pnl   <- sum(res$Returns, na.rm = TRUE)
-  n_trades    <- nrow(res)
-  n_wins      <- sum(res$Returns > 0, na.rm = TRUE)
-  n_losses    <- sum(res$Returns < 0, na.rm = TRUE)
+  # One row per trade: partial-exit legs aggregate to a single trade whose
+  # result is the sum of its legs.
+  if ("Order_ID" %in% names(res)) {
+    tr <- res[, .(Ret = sum(Returns, na.rm = TRUE),
+                  ExitTime = max(ExitTime)), by = Order_ID]
+  } else {
+    tr <- res[, .(Ret = Returns, ExitTime)]
+  }
+
+  total_pnl   <- sum(tr$Ret, na.rm = TRUE)
+  n_trades    <- nrow(tr)
+  n_wins      <- tr[Ret > 0, .N]
+  n_losses    <- tr[Ret < 0, .N]
   win_rate    <- if (n_trades > 0) 100 * n_wins / n_trades else NA_real_
 
-  wins_sum      <- sum(res[Returns > 0, Returns], na.rm = TRUE)
-  losses_sum    <- abs(sum(res[Returns < 0, Returns], na.rm = TRUE))
-  profit_factor <- if (losses_sum > 0) wins_sum / losses_sum else Inf
+  wins_sum      <- tr[Ret > 0, sum(Ret)]
+  losses_sum    <- abs(tr[Ret < 0, sum(Ret)])
+  profit_factor <- if (isTRUE(losses_sum > 0)) wins_sum / losses_sum else Inf
 
-  avg_win        <- if (n_wins   > 0) mean(res[Returns > 0, Returns]) else 0
-  avg_loss       <- if (n_losses > 0) mean(res[Returns < 0, Returns]) else 0
+  avg_win        <- if (n_wins   > 0) tr[Ret > 0, mean(Ret)] else 0
+  avg_loss       <- if (n_losses > 0) tr[Ret < 0, mean(Ret)] else 0
   win_loss_ratio <- if (avg_loss != 0) abs(avg_win / avg_loss) else NA_real_
   expectancy     <- (n_wins/n_trades) * avg_win + (n_losses/n_trades) * avg_loss
 
   # Trade-close equity path (quick DD on trade closes)
-  res <- res[order(ExitTime)]
-  res[, Equity_tc := initial_equity + cumsum(Returns)]
-  res[, Peak_tc   := cummax(Equity_tc)]
-  res[, DD_tc     := Equity_tc / Peak_tc - 1]
-  max_trade_dd    <- min(res$DD_tc, na.rm = TRUE)
+  data.table::setorder(tr, ExitTime)
+  tr[, Equity_tc := initial_equity + cumsum(Ret)]
+  tr[, Peak_tc   := cummax(Equity_tc)]
+  tr[, DD_tc     := Equity_tc / Peak_tc - 1]
+  max_trade_dd   <- min(tr$DD_tc, na.rm = TRUE)
 
   # ---------- Equity curve for time-series metrics ----------
   if ("equity_curve" %in% names(bt) && !is.null(bt$equity_curve)) {
@@ -182,9 +124,10 @@ analyze_performance <- function(bt,
   # pad to daily grid (ensures proper daily returns/annualization)
   if (nrow(eq) >= 1L) {
     all_days <- data.table::data.table(Day = seq(min(eq$Day), max(eq$Day), by = "day"))
-    eq <- all_days[eq, on = "Day"]
+    eq <- eq[all_days, on = "Day"]                       # keep every calendar day
     eq[, Equity := data.table::nafill(Equity, "locf")]
     eq <- eq[!is.na(Equity)]
+    eq <- eq[!(data.table::wday(Day) %in% c(1L, 7L))]    # drop weekends -> trading-day grid
   }
 
   if (nrow(eq) < 2L) {
@@ -220,7 +163,7 @@ analyze_performance <- function(bt,
     eq[, Excess := Ret - Rf_d]
 
     # Period length & total return
-    period_days  <- nrow(eq)                  # number of daily returns
+    period_days  <- nrow(eq)                  # trading days on the padded grid
     period_years <- period_days / scale
     gross        <- prod(1 + eq$Ret, na.rm = TRUE)
     total_return <- if (is.finite(gross)) gross - 1 else NA_real_
@@ -273,7 +216,19 @@ analyze_performance <- function(bt,
 }
 
 
-
+#' Calculate trading performance metrics (deprecated)
+#'
+#' @description
+#' Deprecated: use [analyze_performance()]. Kept as a thin wrapper for
+#' backward compatibility; returns the four legacy columns.
+#'
+#' @param bt Backtest results object (output from the backtest function)
+#' @param initial_equity Starting capital
+#' @param risk_free_rate Passed to \code{risk_free} in [analyze_performance()]
+#' @param start,end Optional analysis window
+#'
+#' @import data.table
+#' @export
 calculateTradeMetrics <- function(bt, initial_equity, risk_free_rate = NULL, start = NULL, end = NULL) {
   .Deprecated("analyze_performance", msg = "calculateTradeMetrics() is deprecated; use analyze_performance().")
   m <- analyze_performance(bt, initial_equity = initial_equity,

@@ -16,16 +16,6 @@ load_data_from_yahoo <- function(symbol, from = "2020-01-01", to = Sys.Date()) {
   return(df)
 }
 
-#' @import data.table
-#' @importFrom xts xts
-#' @export
-xts_to_dt <- function(ts) {
-  out <- data.table(date=as.POSIXct(index(ts)),
-                    data.table(ts))
-  return(out)
-}
-
-
 #' Convert data.table to xts time series
 #'
 #' @param dt A data.table with date and OHLC columns
