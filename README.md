@@ -131,6 +131,8 @@ dataset:
 | [`volatility_scaling.R`](inst/examples/volatility_scaling.R) | Two-stage sizing: base allocation, then volatility adjustment |
 | [`volatility_target.R`](inst/examples/volatility_target.R) | Sizing positions to a daily dollar-volatility budget |
 | [`vix_regime.R`](inst/examples/vix_regime.R) | VIX regime classification and per-regime size multipliers |
+| [`mean_reversion_long_short.R`](inst/examples/mean_reversion_long_short.R) | Long and short in one strategy, with partial exits on the long side (requires 0.1.1+) |
+| [`ma_crossover.R`](inst/examples/ma_crossover.R) | The classic dual moving average crossover with a percentage stop |
 
 ## Architecture Layers
 

@@ -188,6 +188,8 @@ pattern and runs end to end on the bundled data.
 | `volatility_scaling.R` | Two-stage sizing: a base allocation halved when current ATR exceeds a multiple of its weekly average. |
 | `volatility_target.R` | Sizing each position so expected daily dollar volatility matches a budget, with a deployment cap and volatility-scaled stops. |
 | `vix_regime.R` | Regime classification from the VIX and per-regime size multipliers; merging an external daily series onto the strategy timeframe. Needs an internet connection once. |
+| `mean_reversion_long_short.R` | Both directions in one strategy; partial exits on the long side — 50% at the mean, remainder at the band. Requires version 0.1.1 or later. |
+| `ma_crossover.R` | The classic dual-MA trend system: enter on the golden cross, exit on the death cross, with a percentage stop. |
 
 ## 5. Reference: the order-column contract
 
