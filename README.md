@@ -111,20 +111,26 @@ plot(results$equity_curve)
 
 ## Documentation
 
-### Tutorials
-1. [Getting Started](docs/01_getting_started.md) - Basic setup and first strategy
-2. [Strategy Development](docs/02_strategy_development.md) - Building trading logic
-3. [Order Types & Execution](docs/03_order_execution.md) - Understanding order mechanics
-4. [Position Management](docs/04_position_management.md) - Sizing and risk control
-5. [Exit Strategies](docs/05_exit_strategies.md) - Professional exit techniques
-6. [Optimization](docs/06_optimization.md) - Parameter tuning and walk-forward analysis
+**[User Guide](GUIDE.md)** — installation, a complete walk-through of your
+first backtest (results, analytics, plots, walk-forward optimization), a
+catalogue of the worked examples, and reference tables for the order-column
+contract and the exit system.
 
-### Examples
-- [Bollinger Band Mean Reversion](inst/examples/bollinger_bands.R)
-- [Dual Moving Average Crossover](inst/examples/ma_crossover.R)
-- [RSI Divergence Strategy](inst/examples/rsi_divergence.R)
-- [Multi-Timeframe Analysis](inst/examples/multi_timeframe.R)
-- [Portfolio Strategies](inst/examples/portfolio.R)
+### Worked examples
+
+All files in [`inst/examples/`](inst/examples) run end to end on the bundled
+dataset:
+
+| File | Demonstrates |
+|---|---|
+| [`boilerplate.R`](inst/examples/boilerplate.R) | The complete workflow: strategy, backtest, analytics, walk-forward optimization |
+| [`boilerplate2.R`](inst/examples/boilerplate2.R) | The same workflow, extensively commented |
+| [`dynamic_exits_trailing.R`](inst/examples/dynamic_exits_trailing.R) | A trailing stop and a moving profit target |
+| [`multi_exit_conditions.R`](inst/examples/multi_exit_conditions.R) | Four exit mechanisms armed at once, and their precedence |
+| [`stop_bracket_breakout.R`](inst/examples/stop_bracket_breakout.R) | Stop entries with a symmetric bracket, one side per run |
+| [`volatility_scaling.R`](inst/examples/volatility_scaling.R) | Two-stage sizing: base allocation, then volatility adjustment |
+| [`volatility_target.R`](inst/examples/volatility_target.R) | Sizing positions to a daily dollar-volatility budget |
+| [`vix_regime.R`](inst/examples/vix_regime.R) | VIX regime classification and per-regime size multipliers |
 
 ## Architecture Layers
 
